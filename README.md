@@ -2,7 +2,7 @@
 
 A **Neovim** colorscheme modelled after vaporwave aesthetics 📼. Characterised by bright contrasting neon colours 🌆
 
-Implemented with **[lush.nvim](https://github.com/rktjmp/lush.nvim)**
+Initially created using **[lush.nvim](https://github.com/rktjmp/lush.nvim)**, then converted into a standalone raw Lua colorscheme for zero dependencies.
 
 Give it a try! Leave a star if you find it amusing ⭐️
 
@@ -23,7 +23,7 @@ Give it a try! Leave a star if you find it amusing ⭐️
 - **`neon`** : Default. Bright, punchy, contrasting colours.
 - **`soft`** : Same feel, softer colours. 
 
-**Light/Dark** 
+**Two modes Light/Dark** 
 - **`light`** : Light mode with a pink tint.
 - **`dark`** : Dark mode with a purple tint.
 
@@ -46,7 +46,6 @@ PS, feel free to add your own with a pull request.
 
 - **Neovim** 0.8+ (0.9+ recommended for Treesitter `@` captures)
 - [`termguicolors`](https://neovim.io/doc/user/options.html#'termguicolors')
-- **[lush.nvim](https://github.com/rktjmp/lush.nvim)** - required dependency (colors are applied via Lush).
 
 ---
 
@@ -63,7 +62,6 @@ Always call **`require("neonwave").setup({ … })` before `colorscheme neonwave`
   "miladggg/neonwave.nvim",
   lazy = false,
   priority = 1000,
-  dependencies = { "rktjmp/lush.nvim" },
   config = function()
     require("neonwave").setup({
       intensity = "neon",
@@ -81,10 +79,8 @@ Use **`lazy = false`** (or otherwise ensure this plugin loads before the first `
 
 ```lua
 require("packer").startup(function(use)
-  use({ "rktjmp/lush.nvim" })
   use({
     "miladggg/neonwave.nvim",
-    requires = { "rktjmp/lush.nvim" },
     config = function()
       require("neonwave").setup({
         intensity = "neon",
@@ -100,7 +96,6 @@ end)
 ### vim-plug
 
 ```vim
-Plug 'rktjmp/lush.nvim'
 Plug 'miladggg/neonwave.nvim'
 
 lua << EOF
@@ -154,7 +149,7 @@ Complete installation and run:
 ## Customizing colors
 
 - All hex lives in **`lua/neonwave/palette.lua`**.
-- **`lua/neonwave/theme.lua`** maps those tokens through Lush.
+- **`lua/neonwave/theme.lua`** applies those tokens with **`vim.api.nvim_set_hl`**.
 
 Feel free to go inside and change around the colours to your liking.
 
@@ -165,8 +160,3 @@ Feel free to go inside and change around the colours to your liking.
 
 Issues and pull requests are welcome. See **[`CONTRIBUTING.md`](CONTRIBUTING.md)** for the contribution details.
 
----
-
-## Acknowledgements
-
-- **[lush.nvim](https://github.com/rktjmp/lush.nvim)** - colorscheme DSL and tooling.

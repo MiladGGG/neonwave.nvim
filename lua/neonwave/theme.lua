@@ -1,316 +1,322 @@
-local lush = require("lush")
-local hsl = lush.hsl
-local neonwave = require("neonwave")
-local P = neonwave.get_palette()
-local tr = neonwave.config.transparent_background
-local canvas = tr and "NONE" or hsl(P.bg)
-local chrome = tr and "NONE" or hsl(P.statusline)
+--- Applies all highlight groups using palette keys only (no hex outside palette.lua).
 
----@diagnostic disable: undefined-global
-return lush(function(injected)
-  local sym = injected.sym
+local M = {}
 
-  return {
-    Normal { bg = canvas, fg = hsl(P.fg) },
-    NormalNC { bg = canvas, fg = hsl(P.fg_dim) },
-    NormalFloat { bg = hsl(P.surface), fg = hsl(P.fg) },
-    FloatBorder { fg = hsl(P.border), bg = hsl(P.surface) },
-    FloatTitle { fg = hsl(P.float_title), bg = hsl(P.surface), gui = "bold" },
+function M.apply()
+  local nw = require("neonwave")
+  local P = nw.get_palette()
+  local tr = nw.config.transparent_background
+  local canvas = tr and "NONE" or P.bg
+  local chrome = tr and "NONE" or P.statusline
 
-    Cursor { bg = hsl(P.pink), fg = hsl(P.cursor_fg) },
-    lCursor { Cursor },
-    CursorIM { Cursor },
-    CursorLine { bg = hsl(P.cursor_line) },
-    CursorColumn { bg = hsl(P.cursor_line) },
-    ColorColumn { bg = hsl(P.surface_elevated) },
-    LineNr { fg = hsl(P.line_nr), bg = canvas },
-    LineNrAbove { LineNr },
-    LineNrBelow { LineNr },
-    CursorLineNr { fg = hsl(P.line_nr_cursor), gui = "bold" },
-    SignColumn { bg = canvas, fg = hsl(P.line_nr) },
-    FoldColumn { fg = hsl(P.comment), bg = canvas },
-    Folded { fg = hsl(P.comment), bg = hsl(P.surface) },
+  local hl = vim.api.nvim_set_hl
+  ---@param name string
+  ---@param opts vim.api.keyset.highlight
+  local function h(name, opts)
+    hl(0, name, opts)
+  end
 
-    StatusLine { bg = chrome, fg = hsl(P.fg) },
-    StatusLineNC { bg = chrome, fg = hsl(P.fg_dim) },
-    TabLine { bg = chrome, fg = hsl(P.fg_dim) },
-    TabLineFill { bg = chrome },
-    TabLineSel { bg = hsl(P.tabline_sel), fg = hsl(P.pink), gui = "bold" },
-    WinBar { bg = canvas, fg = hsl(P.fg_dim) },
-    WinBarNC { bg = canvas, fg = hsl(P.comment) },
+  h("Normal", { bg = canvas, fg = P.fg })
+  h("NormalNC", { bg = canvas, fg = P.fg_dim })
+  h("NormalFloat", { bg = P.surface, fg = P.fg })
+  h("FloatBorder", { fg = P.border, bg = P.surface })
+  h("FloatTitle", { fg = P.float_title, bg = P.surface, bold = true })
 
-    VertSplit { fg = hsl(P.border), bg = canvas },
-    Winseparator { VertSplit },
+  h("Cursor", { bg = P.pink, fg = P.cursor_fg })
+  h("lCursor", { link = "Cursor" })
+  h("CursorIM", { link = "Cursor" })
+  h("CursorLine", { bg = P.cursor_line })
+  h("CursorColumn", { bg = P.cursor_line })
+  h("ColorColumn", { bg = P.surface_elevated })
+  h("LineNr", { fg = P.line_nr, bg = canvas })
+  h("LineNrAbove", { link = "LineNr" })
+  h("LineNrBelow", { link = "LineNr" })
+  h("CursorLineNr", { fg = P.line_nr_cursor, bold = true })
+  h("SignColumn", { bg = canvas, fg = P.line_nr })
+  h("FoldColumn", { fg = P.comment, bg = canvas })
+  h("Folded", { fg = P.comment, bg = P.surface })
 
-    Pmenu { bg = hsl(P.pmenu), fg = hsl(P.fg) },
-    PmenuSel { bg = hsl(P.pmenu_sel), fg = hsl(P.fg) },
-    PmenuSbar { bg = hsl(P.surface) },
-    PmenuThumb { bg = hsl(P.pmenu_thumb) },
-    WildMenu { bg = hsl(P.wildmenu), fg = hsl(P.fg) },
+  h("StatusLine", { bg = chrome, fg = P.fg })
+  h("StatusLineNC", { bg = chrome, fg = P.fg_dim })
+  h("TabLine", { bg = chrome, fg = P.fg_dim })
+  h("TabLineFill", { bg = chrome })
+  h("TabLineSel", { bg = P.tabline_sel, fg = P.pink, bold = true })
+  h("WinBar", { bg = canvas, fg = P.fg_dim })
+  h("WinBarNC", { bg = canvas, fg = P.comment })
 
-    Visual { bg = hsl(P.visual) },
-    VisualNOS { Visual },
-    Search { bg = hsl(P.search), fg = hsl(P.fg) },
-    CurSearch { bg = hsl(P.inc_search), fg = hsl(P.on_search), gui = "bold" },
-    IncSearch { CurSearch },
-    Substitute { Search },
+  h("VertSplit", { fg = P.border, bg = canvas })
+  h("Winseparator", { link = "VertSplit" })
 
-    Directory { fg = hsl(P.cyan) },
-    Title { fg = hsl(P.title), gui = "bold" },
-    Question { fg = hsl(P.cyan) },
-    MoreMsg { fg = hsl(P.cyan) },
-    ModeMsg { fg = hsl(P.pink) },
-    MsgArea { Normal },
-    MsgSeparator { fg = hsl(P.border) },
+  h("Pmenu", { bg = P.pmenu, fg = P.fg })
+  h("PmenuSel", { bg = P.pmenu_sel, fg = P.fg })
+  h("PmenuSbar", { bg = P.surface })
+  h("PmenuThumb", { bg = P.pmenu_thumb })
+  h("WildMenu", { bg = P.wildmenu, fg = P.fg })
 
-    ErrorMsg { fg = hsl(P.error), gui = "bold" },
-    WarningMsg { fg = hsl(P.warn), gui = "bold" },
+  h("Visual", { bg = P.visual })
+  h("VisualNOS", { link = "Visual" })
+  h("Search", { bg = P.search, fg = P.fg })
+  h("CurSearch", { bg = P.inc_search, fg = P.on_search, bold = true })
+  h("IncSearch", { link = "CurSearch" })
+  h("Substitute", { link = "Search" })
 
-    MatchParen {
-      bg = hsl(P.match_paren_bg),
-      fg = hsl(P.pink_glow),
-      sp = hsl(P.match_paren_sp),
-      gui = "bold,undercurl",
-    },
+  h("Directory", { fg = P.cyan })
+  h("Title", { fg = P.title, bold = true })
+  h("Question", { fg = P.cyan })
+  h("MoreMsg", { fg = P.cyan })
+  h("ModeMsg", { fg = P.pink })
+  h("MsgArea", { link = "Normal" })
+  h("MsgSeparator", { fg = P.border })
 
-    NonText { fg = hsl(P.eob) },
-    EndOfBuffer { NonText },
-    Whitespace { fg = hsl(P.whitespace) },
-    SpecialKey { fg = hsl(P.special) },
+  h("ErrorMsg", { fg = P.error, bold = true })
+  h("WarningMsg", { fg = P.warn, bold = true })
 
-    SpellBad { sp = hsl(P.error), gui = "undercurl" },
-    SpellCap { sp = hsl(P.warn), gui = "undercurl" },
-    SpellLocal { sp = hsl(P.info), gui = "undercurl" },
-    SpellRare { sp = hsl(P.hint), gui = "undercurl" },
+  h("MatchParen", {
+    bg = P.match_paren_bg,
+    fg = P.pink_glow,
+    sp = P.match_paren_sp,
+    bold = true,
+    undercurl = true,
+  })
 
-    DiffAdd { bg = hsl(P.added) },
-    DiffChange { bg = hsl(P.changed) },
-    DiffDelete { bg = hsl(P.deleted) },
-    DiffText { bg = hsl(P.surface_elevated), fg = hsl(P.cyan_glow) },
+  h("NonText", { fg = P.eob })
+  h("EndOfBuffer", { link = "NonText" })
+  h("Whitespace", { fg = P.whitespace })
+  h("SpecialKey", { fg = P.special })
 
-    QuickFixLine { bg = hsl(P.cursor_line) },
+  h("SpellBad", { sp = P.error, undercurl = true })
+  h("SpellCap", { sp = P.warn, undercurl = true })
+  h("SpellLocal", { sp = P.info, undercurl = true })
+  h("SpellRare", { sp = P.hint, undercurl = true })
 
-    Comment { fg = hsl(P.comment), gui = "italic" },
-    Constant { fg = hsl(P.purple) },
-    String { fg = hsl(P.string) },
-    Character { String },
-    Number { fg = hsl(P.number) },
-    Boolean { fg = hsl(P.boolean) },
-    Float { Number },
+  h("DiffAdd", { bg = P.added })
+  h("DiffChange", { bg = P.changed })
+  h("DiffDelete", { bg = P.deleted })
+  h("DiffText", { bg = P.surface_elevated, fg = P.cyan_glow })
 
-    Identifier { fg = hsl(P.fg) },
-    Function { fg = hsl(P.cyan), gui = "bold" },
+  h("QuickFixLine", { bg = P.cursor_line })
 
-    Statement { fg = hsl(P.pink) },
-    Conditional { Statement },
-    Repeat { Statement },
-    Label { fg = hsl(P.magenta) },
-    Operator { fg = hsl(P.operator) },
-    Keyword { fg = hsl(P.pink), gui = "bold" },
-    Exception { Keyword },
+  h("Comment", { fg = P.comment, italic = true })
+  h("Constant", { fg = P.purple })
+  h("String", { fg = P.string })
+  h("Character", { link = "String" })
+  h("Number", { fg = P.number })
+  h("Boolean", { fg = P.boolean })
+  h("Float", { link = "Number" })
 
-    PreProc { fg = hsl(P.magenta) },
-    Include { PreProc },
-    Define { PreProc },
-    Macro { PreProc },
-    PreCondit { PreProc },
+  h("Identifier", { fg = P.fg })
+  h("Function", { fg = P.cyan, bold = true })
 
-    Type { fg = hsl(P.purple), gui = "bold" },
-    StorageClass { Type },
-    Structure { Type },
-    Typedef { Type },
+  h("Statement", { fg = P.pink })
+  h("Conditional", { link = "Statement" })
+  h("Repeat", { link = "Statement" })
+  h("Label", { fg = P.magenta })
+  h("Operator", { fg = P.operator })
+  h("Keyword", { fg = P.pink, bold = true })
+  h("Exception", { link = "Keyword" })
 
-    Special { fg = hsl(P.special) },
-    SpecialChar { Special },
-    Tag { fg = hsl(P.cyan_glow) },
-    Delimiter { fg = hsl(P.delimiter) },
-    SpecialComment { Comment },
-    Debug { Special },
+  h("PreProc", { fg = P.magenta })
+  h("Include", { link = "PreProc" })
+  h("Define", { link = "PreProc" })
+  h("Macro", { link = "PreProc" })
+  h("PreCondit", { link = "PreProc" })
 
-    Underlined { fg = hsl(P.cyan), gui = "underline" },
-    Ignore { fg = hsl(P.bg) },
-    Error { fg = hsl(P.error), bg = hsl(P.surface), gui = "bold" },
-    Todo { fg = hsl(P.warn), bg = hsl(P.surface), gui = "bold,italic" },
+  h("Type", { fg = P.purple, bold = true })
+  h("StorageClass", { link = "Type" })
+  h("Structure", { link = "Type" })
+  h("Typedef", { link = "Type" })
 
-    -- LSP semantic highlights (0.9+)
-    LspReferenceText { bg = hsl(P.visual) },
-    LspReferenceRead { LspReferenceText },
-    LspReferenceWrite { bg = hsl(P.search) },
-    LspCodeLens { fg = hsl(P.comment), gui = "italic" },
-    LspCodeLensSeparator { fg = hsl(P.border) },
-    LspSignatureActiveParameter { fg = hsl(P.cyan_glow), gui = "bold,underline" },
+  h("Special", { fg = P.special })
+  h("SpecialChar", { link = "Special" })
+  h("Tag", { fg = P.cyan_glow })
+  h("Delimiter", { fg = P.delimiter })
+  h("SpecialComment", { link = "Comment" })
+  h("Debug", { link = "Special" })
 
-    DiagnosticError { fg = hsl(P.error) },
-    DiagnosticWarn { fg = hsl(P.warn) },
-    DiagnosticInfo { fg = hsl(P.info) },
-    DiagnosticHint { fg = hsl(P.hint) },
-    DiagnosticOk { fg = hsl(P.ok) },
+  h("Underlined", { fg = P.cyan, underline = true })
+  h("Ignore", { fg = P.bg })
+  h("Error", { fg = P.error, bg = P.surface, bold = true })
+  h("Todo", { fg = P.warn, bg = P.surface, bold = true, italic = true })
 
-    DiagnosticVirtualTextError { DiagnosticError, bg = hsl(P.surface) },
-    DiagnosticVirtualTextWarn { DiagnosticWarn, bg = hsl(P.surface) },
-    DiagnosticVirtualTextInfo { DiagnosticInfo, bg = hsl(P.surface) },
-    DiagnosticVirtualTextHint { DiagnosticHint, bg = hsl(P.surface) },
-    DiagnosticVirtualTextOk { DiagnosticOk, bg = hsl(P.surface) },
+  h("LspReferenceText", { bg = P.visual })
+  h("LspReferenceRead", { link = "LspReferenceText" })
+  h("LspReferenceWrite", { bg = P.search })
+  h("LspCodeLens", { fg = P.comment, italic = true })
+  h("LspCodeLensSeparator", { fg = P.border })
+  h("LspSignatureActiveParameter", { fg = P.cyan_glow, bold = true, underline = true })
 
-    DiagnosticUnderlineError { sp = hsl(P.error), gui = "undercurl" },
-    DiagnosticUnderlineWarn { sp = hsl(P.warn), gui = "undercurl" },
-    DiagnosticUnderlineInfo { sp = hsl(P.info), gui = "undercurl" },
-    DiagnosticUnderlineHint { sp = hsl(P.hint), gui = "undercurl" },
-    DiagnosticUnderlineOk { sp = hsl(P.ok), gui = "undercurl" },
+  h("DiagnosticError", { fg = P.error })
+  h("DiagnosticWarn", { fg = P.warn })
+  h("DiagnosticInfo", { fg = P.info })
+  h("DiagnosticHint", { fg = P.hint })
+  h("DiagnosticOk", { fg = P.ok })
 
-    DiagnosticFloatingError { DiagnosticError },
-    DiagnosticFloatingWarn { DiagnosticWarn },
-    DiagnosticFloatingInfo { DiagnosticInfo },
-    DiagnosticFloatingHint { DiagnosticHint },
-    DiagnosticFloatingOk { DiagnosticOk },
+  h("DiagnosticVirtualTextError", { fg = P.error, bg = P.surface })
+  h("DiagnosticVirtualTextWarn", { fg = P.warn, bg = P.surface })
+  h("DiagnosticVirtualTextInfo", { fg = P.info, bg = P.surface })
+  h("DiagnosticVirtualTextHint", { fg = P.hint, bg = P.surface })
+  h("DiagnosticVirtualTextOk", { fg = P.ok, bg = P.surface })
 
-    DiagnosticSignError { fg = hsl(P.error) },
-    DiagnosticSignWarn { fg = hsl(P.warn) },
-    DiagnosticSignInfo { fg = hsl(P.info) },
-    DiagnosticSignHint { fg = hsl(P.hint) },
-    DiagnosticSignOk { fg = hsl(P.ok) },
+  h("DiagnosticUnderlineError", { sp = P.error, undercurl = true })
+  h("DiagnosticUnderlineWarn", { sp = P.warn, undercurl = true })
+  h("DiagnosticUnderlineInfo", { sp = P.info, undercurl = true })
+  h("DiagnosticUnderlineHint", { sp = P.hint, undercurl = true })
+  h("DiagnosticUnderlineOk", { sp = P.ok, undercurl = true })
 
-    -- Treesitter
-    sym("@comment") { Comment },
-    sym("@punctuation") { Delimiter },
-    sym("@punctuation.bracket") { Delimiter },
-    sym("@punctuation.special") { Special },
+  h("DiagnosticFloatingError", { link = "DiagnosticError" })
+  h("DiagnosticFloatingWarn", { link = "DiagnosticWarn" })
+  h("DiagnosticFloatingInfo", { link = "DiagnosticInfo" })
+  h("DiagnosticFloatingHint", { link = "DiagnosticHint" })
+  h("DiagnosticFloatingOk", { link = "DiagnosticOk" })
 
-    sym("@constant") { Constant },
-    sym("@constant.builtin") { Special },
-    sym("@constant.macro") { Define },
-    sym("@string") { String },
-    sym("@string.escape") { SpecialChar },
-    sym("@string.special") { SpecialChar },
-    sym("@string.regexp") { Special },
-    sym("@character") { Character },
-    sym("@character.special") { SpecialChar },
-    sym("@number") { Number },
-    sym("@boolean") { Boolean },
-    sym("@float") { Float },
+  h("DiagnosticSignError", { fg = P.error })
+  h("DiagnosticSignWarn", { fg = P.warn })
+  h("DiagnosticSignInfo", { fg = P.info })
+  h("DiagnosticSignHint", { fg = P.hint })
+  h("DiagnosticSignOk", { fg = P.ok })
 
-    sym("@function") { Function },
-    sym("@function.builtin") { Special },
-    sym("@function.macro") { Macro },
-    sym("@function.call") { Function },
-    sym("@method") { Function },
-    sym("@method.call") { Function },
+  -- Treesitter
+  h("@comment", { link = "Comment" })
+  h("@punctuation", { link = "Delimiter" })
+  h("@punctuation.bracket", { link = "Delimiter" })
+  h("@punctuation.special", { link = "Special" })
 
-    sym("@constructor") { Type },
-    sym("@parameter") { Identifier },
-    sym("@keyword") { Keyword },
-    sym("@keyword.function") { Keyword },
-    sym("@keyword.operator") { Operator },
-    sym("@keyword.return") { Keyword },
-    sym("@keyword.import") { PreProc },
-    sym("@keyword.export") { PreProc },
-    sym("@conditional") { Conditional },
-    sym("@repeat") { Repeat },
-    sym("@label") { Label },
-    sym("@operator") { Operator },
-    sym("@exception") { Exception },
+  h("@constant", { link = "Constant" })
+  h("@constant.builtin", { link = "Special" })
+  h("@constant.macro", { link = "Define" })
+  h("@string", { link = "String" })
+  h("@string.escape", { link = "SpecialChar" })
+  h("@string.special", { link = "SpecialChar" })
+  h("@string.regexp", { link = "Special" })
+  h("@character", { link = "Character" })
+  h("@character.special", { link = "SpecialChar" })
+  h("@number", { link = "Number" })
+  h("@boolean", { link = "Boolean" })
+  h("@float", { link = "Float" })
 
-    sym("@type") { Type },
-    sym("@type.builtin") { Type },
-    sym("@type.definition") { Typedef },
-    sym("@type.qualifier") { Statement },
-    sym("@storageclass") { StorageClass },
-    sym("@attribute") { PreProc },
-    sym("@field") { fg = hsl(P.fg) },
-    sym("@property") { sym("@field") },
+  h("@function", { link = "Function" })
+  h("@function.builtin", { link = "Special" })
+  h("@function.macro", { link = "Macro" })
+  h("@function.call", { link = "Function" })
+  h("@method", { link = "Function" })
+  h("@method.call", { link = "Function" })
 
-    sym("@variable") { Identifier },
-    sym("@variable.builtin") { Special },
-    sym("@variable.member") { sym("@field") },
-    sym("@variable.parameter") { sym("@parameter") },
+  h("@constructor", { link = "Type" })
+  h("@parameter", { link = "Identifier" })
+  h("@keyword", { link = "Keyword" })
+  h("@keyword.function", { link = "Keyword" })
+  h("@keyword.operator", { link = "Operator" })
+  h("@keyword.return", { link = "Keyword" })
+  h("@keyword.import", { link = "PreProc" })
+  h("@keyword.export", { link = "PreProc" })
+  h("@conditional", { link = "Conditional" })
+  h("@repeat", { link = "Repeat" })
+  h("@label", { link = "Label" })
+  h("@operator", { link = "Operator" })
+  h("@exception", { link = "Exception" })
 
-    sym("@namespace") { fg = hsl(P.purple_glow) },
-    sym("@module") { sym("@namespace") },
+  h("@type", { link = "Type" })
+  h("@type.builtin", { link = "Type" })
+  h("@type.definition", { link = "Typedef" })
+  h("@type.qualifier", { link = "Statement" })
+  h("@storageclass", { link = "StorageClass" })
+  h("@attribute", { link = "PreProc" })
+  h("@field", { fg = P.fg })
+  h("@property", { link = "@field" })
 
-    sym("@text") { Normal },
-    sym("@text.literal") { String },
-    sym("@text.reference") { Identifier },
-    sym("@text.title") { Title },
-    sym("@text.uri") { Underlined },
-    sym("@text.underline") { Underlined },
-    sym("@text.todo") { Todo },
-    sym("@text.note") { DiagnosticInfo },
-    sym("@text.warning") { DiagnosticWarn },
-    sym("@text.danger") { DiagnosticError },
+  h("@variable", { link = "Identifier" })
+  h("@variable.builtin", { link = "Special" })
+  h("@variable.member", { link = "@field" })
+  h("@variable.parameter", { link = "@parameter" })
 
-    sym("@markup.heading") { Title },
-    sym("@markup.link") { Underlined },
-    sym("@markup.link.url") { fg = hsl(P.cyan), gui = "underline" },
-    sym("@markup.list") { Statement },
-    sym("@markup.strong") { Normal, gui = "bold" },
-    sym("@markup.italic") { Normal, gui = "italic" },
-    sym("@markup.raw") { String },
+  h("@namespace", { fg = P.purple_glow })
+  h("@module", { link = "@namespace" })
 
-    sym("@tag") { Tag },
-    sym("@tag.attribute") { sym("@property") },
-    sym("@tag.delimiter") { Delimiter },
+  h("@text", { link = "Normal" })
+  h("@text.literal", { link = "String" })
+  h("@text.reference", { link = "Identifier" })
+  h("@text.title", { link = "Title" })
+  h("@text.uri", { link = "Underlined" })
+  h("@text.underline", { link = "Underlined" })
+  h("@text.todo", { link = "Todo" })
+  h("@text.note", { link = "DiagnosticInfo" })
+  h("@text.warning", { link = "DiagnosticWarn" })
+  h("@text.danger", { link = "DiagnosticError" })
 
-    sym("@define") { Define },
-    sym("@macro") { Macro },
-    sym("@include") { Include },
-    sym("@preproc") { PreProc },
-    sym("@debug") { Debug },
+  h("@markup.heading", { link = "Title" })
+  h("@markup.link", { link = "Underlined" })
+  h("@markup.link.url", { fg = P.cyan, underline = true })
+  h("@markup.list", { link = "Statement" })
+  h("@markup.strong", { bg = canvas, fg = P.fg, bold = true })
+  h("@markup.italic", { bg = canvas, fg = P.fg, italic = true })
+  h("@markup.raw", { link = "String" })
 
-    -- snacks.nvim picker (defaults link Unselected/Dir/etc. to NonText — too faint on dark neon)
-    SnacksPickerNormal { bg = hsl(P.surface), fg = hsl(P.fg) },
-    SnacksPickerBorder { FloatBorder },
-    SnacksPickerTitle { FloatTitle },
-    SnacksPickerListCursorLine { CursorLine },
-    SnacksPickerCursorLine { CursorLine },
-    SnacksPickerSelected { fg = hsl(P.number), gui = "bold" },
-    SnacksPickerGitStatus { fg = hsl(P.fg_dim) },
-    SnacksPickerUnselected { fg = hsl(P.fg_dim) },
-    SnacksPickerDimmed { fg = hsl(P.comment) },
-    SnacksPickerDir { fg = hsl(P.fg_dim) },
-    SnacksPickerPathIgnored { fg = hsl(P.comment) },
-    SnacksPickerPathHidden { fg = hsl(P.comment) },
-    SnacksPickerTotals { fg = hsl(P.fg_dim) },
-    SnacksPickerKeymapRhs { fg = hsl(P.fg_dim) },
-    SnacksPickerBufFlags { fg = hsl(P.fg_dim) },
-    SnacksPickerGitStatusIgnored { fg = hsl(P.comment) },
-    SnacksPickerGitStatusUntracked { fg = hsl(P.line_nr) },
-    SnacksPickerFile { fg = hsl(P.fg) },
-    SnacksPickerSpecial { fg = hsl(P.magenta) },
-    SnacksPickerLabel { SnacksPickerSpecial },
-    SnacksPickerPrompt { bg = hsl(P.surface), fg = hsl(P.cyan) },
-    SnacksPickerMatch { bg = hsl(P.surface), fg = hsl(P.pink), gui = "bold" },
-    SnacksPickerInputSearch { bg = hsl(P.surface), Keyword },
+  h("@tag", { link = "Tag" })
+  h("@tag.attribute", { link = "@property" })
+  h("@tag.delimiter", { link = "Delimiter" })
 
-    -- Neo-tree
-    NeoTreeNormal { Normal },
-    NeoTreeNormalNC { NormalNC },
-    NeoTreeCursorLine { CursorLine },
-    NeoTreeRootName { fg = hsl(P.pink), gui = "bold" },
-    NeoTreeDirectoryName { fg = hsl(P.cyan) },
-    NeoTreeDirectoryIcon { fg = hsl(P.cyan) },
-    NeoTreeFileName { fg = hsl(P.fg) },
-    NeoTreeFileIcon { fg = hsl(P.fg_dim) },
-    NeoTreeSymbolicLinkTarget { fg = hsl(P.magenta), gui = "underline" },
-    NeoTreeIndentMarker { fg = hsl(P.border) },
-    NeoTreeExpander { fg = hsl(P.comment) },
-    NeoTreeTitleBar { StatusLine },
-    NeoTreeTabActive { fg = hsl(P.pink), bg = hsl(P.surface_elevated), gui = "bold" },
-    NeoTreeTabInactive { fg = hsl(P.fg_dim), bg = hsl(P.surface) },
-    NeoTreeTabSeparatorActive { fg = hsl(P.border), bg = hsl(P.surface_elevated) },
-    NeoTreeTabSeparatorInactive { fg = hsl(P.border), bg = hsl(P.surface) },
+  h("@define", { link = "Define" })
+  h("@macro", { link = "Macro" })
+  h("@include", { link = "Include" })
+  h("@preproc", { link = "PreProc" })
+  h("@debug", { link = "Debug" })
 
-    NeoTreeGitAdded { fg = hsl(P.ok) },
-    NeoTreeGitDeleted { fg = hsl(P.error) },
-    NeoTreeGitModified { fg = hsl(P.warn) },
-    NeoTreeGitConflict { fg = hsl(P.magenta), gui = "bold" },
-    NeoTreeGitIgnored { fg = hsl(P.comment) },
-    NeoTreeGitUntracked { fg = hsl(P.hint) },
-    NeoTreeGitStaged { fg = hsl(P.cyan) },
+  -- snacks.nvim picker
+  h("SnacksPickerNormal", { bg = P.surface, fg = P.fg })
+  h("SnacksPickerBorder", { link = "FloatBorder" })
+  h("SnacksPickerTitle", { link = "FloatTitle" })
+  h("SnacksPickerListCursorLine", { link = "CursorLine" })
+  h("SnacksPickerCursorLine", { link = "CursorLine" })
+  h("SnacksPickerSelected", { fg = P.number, bold = true })
+  h("SnacksPickerGitStatus", { fg = P.fg_dim })
+  h("SnacksPickerUnselected", { fg = P.fg_dim })
+  h("SnacksPickerDimmed", { fg = P.comment })
+  h("SnacksPickerDir", { fg = P.fg_dim })
+  h("SnacksPickerPathIgnored", { fg = P.comment })
+  h("SnacksPickerPathHidden", { fg = P.comment })
+  h("SnacksPickerTotals", { fg = P.fg_dim })
+  h("SnacksPickerKeymapRhs", { fg = P.fg_dim })
+  h("SnacksPickerBufFlags", { fg = P.fg_dim })
+  h("SnacksPickerGitStatusIgnored", { fg = P.comment })
+  h("SnacksPickerGitStatusUntracked", { fg = P.line_nr })
+  h("SnacksPickerFile", { fg = P.fg })
+  h("SnacksPickerSpecial", { fg = P.magenta })
+  h("SnacksPickerLabel", { link = "SnacksPickerSpecial" })
+  h("SnacksPickerPrompt", { bg = P.surface, fg = P.cyan })
+  h("SnacksPickerMatch", { bg = P.surface, fg = P.pink, bold = true })
+  h("SnacksPickerInputSearch", { bg = P.surface, fg = P.pink, bold = true })
 
-    NeoTreeFloatTitle { FloatTitle },
-    NeoTreeFloatBorder { FloatBorder },
-    NeoTreeMessage { fg = hsl(P.fg_dim) },
-    NeoTreeDimText { fg = hsl(P.comment) },
-    NeoTreeFilterTerm { fg = hsl(P.pink), gui = "bold" },
-  }
-end)
+  -- Neo-tree
+  h("NeoTreeNormal", { link = "Normal" })
+  h("NeoTreeNormalNC", { link = "NormalNC" })
+  h("NeoTreeCursorLine", { link = "CursorLine" })
+  h("NeoTreeRootName", { fg = P.pink, bold = true })
+  h("NeoTreeDirectoryName", { fg = P.cyan })
+  h("NeoTreeDirectoryIcon", { fg = P.cyan })
+  h("NeoTreeFileName", { fg = P.fg })
+  h("NeoTreeFileIcon", { fg = P.fg_dim })
+  h("NeoTreeSymbolicLinkTarget", { fg = P.magenta, underline = true })
+  h("NeoTreeIndentMarker", { fg = P.border })
+  h("NeoTreeExpander", { fg = P.comment })
+  h("NeoTreeTitleBar", { link = "StatusLine" })
+  h("NeoTreeTabActive", { fg = P.pink, bg = P.surface_elevated, bold = true })
+  h("NeoTreeTabInactive", { fg = P.fg_dim, bg = P.surface })
+  h("NeoTreeTabSeparatorActive", { fg = P.border, bg = P.surface_elevated })
+  h("NeoTreeTabSeparatorInactive", { fg = P.border, bg = P.surface })
+
+  h("NeoTreeGitAdded", { fg = P.ok })
+  h("NeoTreeGitDeleted", { fg = P.error })
+  h("NeoTreeGitModified", { fg = P.warn })
+  h("NeoTreeGitConflict", { fg = P.magenta, bold = true })
+  h("NeoTreeGitIgnored", { fg = P.comment })
+  h("NeoTreeGitUntracked", { fg = P.hint })
+  h("NeoTreeGitStaged", { fg = P.cyan })
+
+  h("NeoTreeFloatTitle", { link = "FloatTitle" })
+  h("NeoTreeFloatBorder", { link = "FloatBorder" })
+  h("NeoTreeMessage", { fg = P.fg_dim })
+  h("NeoTreeDimText", { fg = P.comment })
+  h("NeoTreeFilterTerm", { fg = P.pink, bold = true })
+end
+
+return M

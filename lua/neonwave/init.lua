@@ -44,4 +44,16 @@ function M.get_palette()
   return palettes[M.get_background()][M.get_intensity()]
 end
 
+--- Apply all highlight groups via `vim.api.nvim_set_hl`.
+--- Call after `setup()`. Used by `:colorscheme neonwave` via `colors/neonwave.lua`.
+function M.load()
+  vim.opt.background = M.get_background()
+  vim.cmd.highlight("clear")
+  if vim.fn.exists("syntax_on") == 1 then
+    vim.cmd.syntax("reset")
+  end
+  package.loaded["neonwave.theme"] = nil
+  require("neonwave.theme").apply()
+end
+
 return M
