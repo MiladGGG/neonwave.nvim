@@ -68,7 +68,6 @@ Always call **`require("neonwave").setup({ … })` before `colorscheme neonwave`
       background = "dark", -- 'light' or dark'
       transparent_background = false, -- true or false
     })
-    vim.cmd.colorscheme("neonwave")
   end,
 }
 ```
@@ -87,7 +86,6 @@ require("packer").startup(function(use)
         background = "dark", -- 'light' or dark'
         transparent_background = false, -- true or false
       })
-      vim.cmd.colorscheme("neonwave")
     end,
   })
 end)
@@ -104,7 +102,6 @@ require("neonwave").setup({
   background = "dark", -- 'light' or dark'
   transparent_background = false, -- true or false
 })
-vim.cmd.colorscheme("neonwave")
 EOF
 ```
 
