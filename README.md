@@ -64,9 +64,9 @@ Always call **`require("neonwave").setup({ … })` before `colorscheme neonwave`
   priority = 1000,
   config = function()
     require("neonwave").setup({
-      intensity = "neon",
-      background = "dark",
-      transparent_background = false,
+      intensity = "neon", -- 'soft' or 'neon'
+      background = "dark", -- 'light' or dark'
+      transparent_background = false, -- true or false
     })
     vim.cmd.colorscheme("neonwave")
   end,
@@ -83,9 +83,9 @@ require("packer").startup(function(use)
     "miladggg/neonwave.nvim",
     config = function()
       require("neonwave").setup({
-        intensity = "neon",
-        background = "dark",
-        transparent_background = false,
+        intensity = "neon", -- 'soft' or 'neon'
+        background = "dark", -- 'light' or dark'
+        transparent_background = false, -- true or false
       })
       vim.cmd.colorscheme("neonwave")
     end,
@@ -100,9 +100,9 @@ Plug 'miladggg/neonwave.nvim'
 
 lua << EOF
 require("neonwave").setup({
-  intensity = "neon",
-  background = "dark",
-  transparent_background = false,
+  intensity = "neon", -- 'soft' or 'neon'
+  background = "dark", -- 'light' or dark'
+  transparent_background = false, -- true or false
 })
 vim.cmd.colorscheme("neonwave")
 EOF
