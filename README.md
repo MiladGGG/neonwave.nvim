@@ -23,9 +23,10 @@ Give it a try! Leave a star if you find it amusing ⭐️
 - **`neon`** : Default. Bright, punchy, contrasting colours.
 - **`soft`** : Same feel, softer colours. 
 
-**Two modes Light/Dark** 
+**Background** 
 - **`light`** : Light mode with a pink tint.
 - **`dark`** : Dark mode with a purple tint.
+- **`auto`** : Default. Follows Neovim's `'background'` (light vs dark palette). The theme does not set that option.
 
 **Transparent Background** 
 - **`false`** : Default. Solid background.
@@ -65,7 +66,7 @@ Always call **`require("neonwave").setup({ … })` before `colorscheme neonwave`
   config = function()
     require("neonwave").setup({
       intensity = "neon", -- 'soft' or 'neon'
-      background = "dark", -- 'light' or dark'
+      background = "auto", -- 'light' or 'dark' to lock; 'auto' follows 'background'
       transparent_background = false, -- true or false
     })
   end,
@@ -83,7 +84,7 @@ require("packer").startup(function(use)
     config = function()
       require("neonwave").setup({
         intensity = "neon", -- 'soft' or 'neon'
-        background = "dark", -- 'light' or dark'
+        background = "auto", -- 'light' or 'dark' to lock; 'auto' follows 'background'
         transparent_background = false, -- true or false
       })
     end,
@@ -99,7 +100,7 @@ Plug 'miladggg/neonwave.nvim'
 lua << EOF
 require("neonwave").setup({
   intensity = "neon", -- 'soft' or 'neon'
-  background = "dark", -- 'light' or dark'
+  background = "auto", -- 'light' or 'dark' to lock; 'auto' follows 'background'
   transparent_background = false, -- true or false
 })
 EOF
@@ -114,16 +115,16 @@ Pass options to **`require("neonwave").setup({ … })`**.
 | Option | Type | Description |
 |--------|------|-------------|
 | `intensity` | `"soft"` \| `"neon"` | Brightness, contrast and colour saturation. |
-| `background` | `"dark"` \| `"light"` | Light and Dark mode. |
+| `background` | `"dark"` \| `"light"` \| `"auto"` | Fixed light/dark palette, or **`auto`** to follow `'background'`. |
 | `transparent_background` | `boolean` | Allows terminal background image to be visible. |
 
 ### Examples
 
-#### Neon Light:
+#### Neon Automatic Background:
 ```lua
 require("neonwave").setup({
   intensity = "neon",
-  background = "light",
+  background = "auto",
 })
 vim.cmd.colorscheme("neonwave")
 ```

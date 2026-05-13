@@ -1,19 +1,38 @@
+---@class NeonWaveUserOpts
+---@field intensity? "soft"|"neon"
+---@field background? "dark"|"light"|"auto"
+---@field transparent_background? boolean
+
+---@class NeonWaveConfig
+---@field intensity "soft"|"neon"
+---@field background "dark"|"light"|"auto"
+---@field transparent_background boolean
+
 local M = {}
 
+---@type NeonWaveConfig
 M.config = {
   intensity = "neon",
-  background = "light",
+  background = "auto",
   transparent_background = false,
 }
 
----@param opts? { intensity?: "soft"|"neon", background?: "dark"|"light", transparent_background?: boolean }
+--- Map Neovim's global `'background'` option to a palette family. Read-only; never mutates `vim.o.background`.
+---@return "dark"|"light"
+local function palette_from_background_option()
+  return vim.o.background == "light" and "light" or "dark"
+end
+
+---@param opts? NeonWaveUserOpts
 function M.setup(opts)
   opts = opts or {}
   if opts.intensity == "soft" or opts.intensity == "neon" then
     M.config.intensity = opts.intensity
   end
-  if opts.background == "dark" or opts.background == "light" then
-    M.config.background = opts.background
+  local bg = opts.background
+  if bg == "dark" or bg == "light" or bg == "auto" then
+    ---@cast bg "dark"|"light"|"auto"
+    M.config.background = bg
   end
   if opts.transparent_background ~= nil then
     M.config.transparent_background = not not opts.transparent_background
@@ -29,13 +48,17 @@ function M.get_intensity()
   return i
 end
 
+--- Resolved palette background: `"dark"` / `"light"` from config, or from `vim.o.background` when config is `"auto"`.
 ---@return "dark"|"light"
 function M.get_background()
   local b = M.config.background
-  if b ~= "dark" and b ~= "light" then
-    return "dark"
+  if b == "dark" or b == "light" then
+    return b
   end
-  return b
+  if b == "auto" then
+    return palette_from_background_option()
+  end
+  return "dark"
 end
 
 ---@return table
@@ -47,7 +70,6 @@ end
 --- Apply all highlight groups via `vim.api.nvim_set_hl`.
 --- Call after `setup()`. Used by `:colorscheme neonwave` via `colors/neonwave.lua`.
 function M.load()
-  vim.opt.background = M.get_background()
   vim.cmd.highlight("clear")
   if vim.fn.exists("syntax_on") == 1 then
     vim.cmd.syntax("reset")
